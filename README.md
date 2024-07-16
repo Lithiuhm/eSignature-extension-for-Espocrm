@@ -37,7 +37,7 @@ And that is all
 
 ### 2.  We write the name, we select the entity case (ticket) and we select the name of the esignature field and for the signature to be seen we must use a pdf helper that I have created and is used as it appears in the photo
 
-#### <img src="{{img_data esignaturefieldname}}">
+#### `<img src="{{img_data esignaturefieldname}}">`
 
 ![put name and label](images/12.png?raw=true)
 
