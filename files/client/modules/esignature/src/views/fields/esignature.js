@@ -200,7 +200,7 @@ Espo.define('esignature:views/fields/esignature', 'views/fields/base', function 
             var d = new Date();
             var timestamp = eSignatureISODateString(d);             
             // prepare the signature drawing to be stored in the database integrating the timestamp
-            var imageSource = '<img src="'+this.$el.jSignature('getData')+'"/><div style=margin-top:-0.5em;font-size:1em;font-style:italic;>Firmado electrónicamente a '+timestamp+'</div>';
+            var imageSource = '<img src="'+this.$el.jSignature('getData')+'"/><div style=margin-top:-0.5em;font-size:1em;font-style:italic;>Electronically signed on '+timestamp+'</div>';
             this.notify('Saving...');
             var self = this;
             var model = this.model;
