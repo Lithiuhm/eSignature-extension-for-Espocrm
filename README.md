@@ -1,5 +1,5 @@
 # eSignature-extension-for-Espocrm
-##Electronic signature for espocrm, tested on espocrm latest versions 8.0 -> Actual (8.3.5)
+## Electronic signature for espocrm, tested on espocrm latest versions 8.0 -> Actual (8.3.5)
 
 Module to allow the use of an electronic signature canvas as a field and to generate full page documents that incorporate the electronic signature and can be printed using the browser's PDF engine
 
