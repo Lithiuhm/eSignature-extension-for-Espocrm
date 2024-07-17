@@ -29,7 +29,7 @@ Steps to create the electronic signature (eSignature) depending on the entity yo
 
 ### 6. Finally upload de extension and install
 
-![put a name](images/21.png?raw=true)
+![put a name](images/22.png?raw=true)
 
 # HOW TO USE
 
