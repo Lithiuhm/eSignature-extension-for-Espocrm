@@ -3,7 +3,7 @@
 
 Module to allow the use of an electronic signature canvas as a field and to generate full page documents that incorporate the electronic signature and can be printed using the browser's PDF engine
 
-Pasos para crear la firma electrónica (eSignature) dependiendo de la entidad que quieras:
+Steps to create the electronic signature (eSignature) depending on the entity you want:
 
 # HOW TO INSTALL 
 
