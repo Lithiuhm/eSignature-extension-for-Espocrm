@@ -5,6 +5,34 @@ Module to allow the use of an electronic signature canvas as a field and to gene
 
 Pasos para crear la firma electrónica (eSignature) dependiendo de la entidad que quieras:
 
+# HOW TO INSTALL 
+
+### 1. Click on code and Download ZIP
+
+![download zip](images/16.png?raw=true)
+
+### 2. now unzip the downloaded file
+
+![unzip](images/18.png?raw=true)
+
+### 3. Delete images folder
+
+![delete images folder](images/19.png?raw=true)
+
+### 4. Now select all files and zip it again
+
+![zip it](images/20.png?raw=true)
+
+### 5. put a name
+
+![put a name](images/21.png?raw=true)
+
+### 6. Finally upload de extension and install
+
+![put a name](images/21.png?raw=true)
+
+# HOW TO USE
+
 ### 1. Create a new entity or edit one that you already have created, do it through the Administration panel. (I will use Ticket)
 
 ![open administrator](images/1.png?raw=true)
@@ -29,7 +57,7 @@ Pasos para crear la firma electrónica (eSignature) dependiendo de la entidad qu
 
 And that is all
 
-# Print to PDF
+# print to PDF
 
 ### 1. We create a PDF template
 
@@ -37,9 +65,16 @@ And that is all
 
 ### 2.  We write the name, we select the entity case (ticket) and we select the name of the esignature field and for the signature to be seen we must use a pdf helper that I have created and is used as it appears in the photo
 
-#### `<img src="{{img_data esignaturefieldname}}">`
+#### ```<img src="{{img_data ESIGNATUREGFILEDNAME}}">``` 
 
 ![put name and label](images/12.png?raw=true)
+
+### And to get the date and time use 
+
+#### ```<img src="{{sign_date ESIGNATUREGFILEDNAME}}">``` 
+
+![put name and label](images/15.png?raw=true)
+![put name and label](images/17.png?raw=true)
 
 ### 3. We reload the page and then we go to the ticket that we have and we give the three points and we print
 
@@ -56,4 +91,4 @@ And that is all
 
 #### references
 
-- [Original extension for espocrm version for OLD VERSIONS](https://github.com/EspoCRM-Custom-Modules/eSignature-for-Documents/tree/master)
+- [Original extension for espocrm OLD VERSIONS](https://github.com/EspoCRM-Custom-Modules/eSignature-for-Documents/tree/master)
