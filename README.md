@@ -87,7 +87,7 @@ And that is all
 
 - [@lithiuhm](https://github.com/Lithiuhm)
 - [@telecastg](https://github.com/telecastg)
-- @Anthony Andriano
+- [@bandtank](https://github.com/bandtank)
 
 #### references
 
