@@ -32,7 +32,7 @@ Copyright (c) 2010 Brinley Ang http://www.unbolt.net
 MIT License <http://www.opensource.org/licenses/mit-license.php>
 */
 
-Espo.define('esignature:views/fields/esignature', 'views/fields/base', function (Dep) {
+Espo.define('esignature:views/fields/esignature', ['views/fields/base', 'language'], function (Dep, language) {
 
     return Dep.extend({
         
@@ -201,6 +201,12 @@ Espo.define('esignature:views/fields/esignature', 'views/fields/base', function 
             var timestamp = eSignatureISODateString(d);             
             // prepare the signature drawing to be stored in the database integrating the timestamp
             var imageSource = '<img src="'+this.$el.jSignature('getData')+'"/><div style=margin-top:-0.5em;font-size:1em;font-style:italic;>Electronically signed on '+timestamp+'</div>';
+            var translatedLabel = language.getMessage('Electronically signed on', 'Global');
+            var imageSource = '<img src="' + this.$el.jSignature('getData') + '"/>' +
+                            '<div style="margin-top:-0.5em;font-size:1em;font-style:italic;">' +
+                            translatedLabel + ' ' + timestamp +
+                            '</div>';
+
             this.notify('Saving...');
             var self = this;
             var model = this.model;

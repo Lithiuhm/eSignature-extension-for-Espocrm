@@ -1,6 +1,6 @@
 {
     "name": "eSignature Documents for EspoCRM",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "acceptableVersions": [
         ">=5.7.8"
     ],
