@@ -187,15 +187,13 @@ Espo.define('esignature:views/fields/esignature', 'views/fields/base', function 
         },
         
         inlineEditSave: function () { // substitutes same function at base.js   
-            // convert the canvas drawing to image code 
-            var imageCode = this.$el.jSignature('getData'); 
-            // compare the contents of the current vs blank canvass to make sure there's a signature to be saved
-            console.log(imageCode)
-            if(this.blankCanvassCode[1] === imageCode) {
-                alert("No signature was entered");
-                this.inlineEditClose();
+            // compare the amount of strokes to make sure there's a signature to be saved
+            const strokes = this.$el.jSignature('getData', 'native');
+            if (!strokes.length) {
+                alert(this.translate('noSignatureEntered', 'messages', 'Global'));
                 return;
-            }  
+            }
+
             // register the signature time stamp
             var d = new Date();
             var timestamp = eSignatureISODateString(d);             
