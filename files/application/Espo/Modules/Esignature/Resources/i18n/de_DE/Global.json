@@ -1,5 +1,7 @@
 {
   "messages": {
-    "Electronically signed on": "Elektronisch unterschrieben am"
+    "electronicallySignedOn": "Elektronisch unterschrieben am",
+    "signHere": "Hier unterschreiben",
+    "noSignatureEntered": "Sie haben nicht unterschrieben"
   }
 }
