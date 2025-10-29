@@ -150,7 +150,7 @@ Espo.define('esignature:views/fields/esignature', 'views/fields/base', function 
             }.bind(this));
             $cell.on('mouseenter', function (e) {
                 e.stopPropagation();
-                if (this.disabled || this.readOnly) {
+                if (this.disabled || this.readOnly || this._isInlineEditMode) {
                         return;
                 }
                 if (this.mode === 'detail') {
@@ -164,7 +164,8 @@ Espo.define('esignature:views/fields/esignature', 'views/fields/base', function 
             }.bind(this));
         },
 
-        inlineEsignatureEdit: function() { // custom function equivalent to "inlineEdit" at base.js            
+        inlineEsignatureEdit: function() { // custom function equivalent to "inlineEdit" at base.js     
+            this._isInlineEditMode = true;       
             // add css class esignature to the field element
             this.$el.addClass('eSignature');
             // initialize jSignature plug-in to display canvas input
