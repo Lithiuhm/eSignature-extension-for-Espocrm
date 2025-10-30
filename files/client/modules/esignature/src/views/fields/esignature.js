@@ -168,16 +168,13 @@ Espo.define('esignature:views/fields/esignature', 'views/fields/base', function 
             // add css class esignature to the field element
             this.$el.addClass('eSignature');
             // initialize jSignature plug-in to display canvas input
-            //var $sigDiv = this.$el.jSignature({'UndoButton':true, 'color':'rgb(5, 1, 135)','SignHere':true});
             var $sigDiv = this.$el.jSignature({
                 UndoButton: true,
                 color: 'rgb(5, 1, 135)',
                 SignHere: {
                     renderer: function () {
                     // eigenes Hinweis-Element zurückgeben
-                    const label =
-                        (this.translate && this.translate('signHere', 'messages', 'Global')) ||
-                        'Hier unterschreiben';
+                    const label = this.translate('signHere', 'messages', 'Global');
 
                     const $badge = $('<div/>', {
                         class: 'jsign-signhere-badge',
