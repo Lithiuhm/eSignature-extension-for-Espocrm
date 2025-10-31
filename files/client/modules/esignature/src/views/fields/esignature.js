@@ -131,7 +131,11 @@ Espo.define('esignature:views/fields/esignature', 'views/fields/base', function 
 
         initInlineEsignatureEdit: function () { // custom function equivalent to "initInlineEdit" at base.js   
             var $cell = this.getCellElement();
-            var $editLink = $('<a href="javascript:" class="pull-right inline-edit-link hidden"><span class="fas fa-pencil-alt fa-sm"></span></a>');
+            var $editLink = $(
+                '<button type="button" class="pull-right inline-edit-link hidden" aria-label="Edit" style="background-color:unset;border:unset;">' +
+                    '<span class="fas fa-pencil-alt fa-sm"></span>' +
+                '</button>'
+                );
             if ($cell.length === 0 || typeof(this.model.get(this.name))=== 'undefined') {
                 this.listenToOnce(this, 'after:render', this.initInlineEsignatureEdit, this);
                 return;
@@ -143,7 +147,9 @@ Espo.define('esignature:views/fields/esignature', 'views/fields/base', function 
             }
             // after the element has been rendered, add the hidden pencil icon link
             $cell.prepend($editLink);
-            $editLink.on('click', function () {
+            $editLink.on('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
                 // when clicked, call the custom signature field inline edit function
                 this.inlineEsignatureEdit(); 
             // bind the functionality to the pencil icon link    
