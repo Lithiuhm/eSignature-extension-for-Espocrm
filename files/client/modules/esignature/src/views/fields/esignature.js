@@ -168,7 +168,22 @@ Espo.define('esignature:views/fields/esignature', 'views/fields/base', function 
             // add css class esignature to the field element
             this.$el.addClass('eSignature');
             // initialize jSignature plug-in to display canvas input
-            var $sigDiv = this.$el.jSignature({'UndoButton':true, 'color':'rgb(5, 1, 135)','SignHere':true});
+            var $sigDiv = this.$el.jSignature({
+                UndoButton: true,
+                color: 'rgb(5, 1, 135)',
+                SignHere: {
+                    renderer: function () {
+                    // eigenes Hinweis-Element zurückgeben
+                    const label = this.translate('signHere', 'messages', 'Global');
+
+                    const $badge = $('<div/>', {
+                        class: 'jsign-signhere-badge',
+                        text: label
+                        });
+                    return $badge;
+                    }.bind(this) // bind, damit this.translate() funktioniert
+                }
+                });
             // get the blank canvass code value to compare against a filled canvas
             this.blankCanvassCode = $sigDiv.jSignature('getData');
             // add the inline action links ("Update" and "Cancel")
@@ -200,7 +215,12 @@ Espo.define('esignature:views/fields/esignature', 'views/fields/base', function 
             var d = new Date();
             var timestamp = eSignatureISODateString(d);             
             // prepare the signature drawing to be stored in the database integrating the timestamp
-            var imageSource = '<img src="'+this.$el.jSignature('getData')+'"/><div style=margin-top:-0.5em;font-size:1em;font-style:italic;>Electronically signed on '+timestamp+'</div>';
+            var translatedLabel = this.translate('electronicallySignedOn', 'messages', 'Global');
+            var imageSource = '<img src="' + this.$el.jSignature('getData') + '"/>' +
+                            '<div style="margin-top:-0.5em;font-size:1em;font-style:italic;">' +
+                            translatedLabel + ' ' + timestamp +
+                            '</div>';
+
             this.notify('Saving...');
             var self = this;
             var model = this.model;
