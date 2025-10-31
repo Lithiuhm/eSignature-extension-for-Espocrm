@@ -88,6 +88,7 @@ And that is all
 - [@lithiuhm](https://github.com/Lithiuhm)
 - [@telecastg](https://github.com/telecastg)
 - [@bandtank](https://github.com/bandtank)
+- [@oguzbinbir](https://github.com/oguzbinbir)
 
 #### references
 
