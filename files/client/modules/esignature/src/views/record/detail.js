@@ -24,62 +24,75 @@
  *
  * In accordance with Section 7(b) of the GNU General Public License version 3,
  * these Appropriate Legal Notices must retain the display of the "EspoCRM" word.
- * 
+ *
  * eSignature - Open source plug in module for EspoCRM
  * Copyright (C) 2020 Omar A Gonsenheim
-************************************************************************/
+ ************************************************************************/
 
-Espo.define('esignature:views/record/detail', 'views/record/detail', function (Dep) {
+define("esignature:views/record/detail", ["views/record/detail"], (
+  DetailRecordView,
+) => {
+  return class EsignatureDetailView extends DetailRecordView {
+    setupActionItems() {
+      super.setupActionItems();
 
-    return Dep.extend({
-        
-        setupActionItems: function (isPrototype = false) {
-            
-            if(!isPrototype) {
-                // if this view is not being used as prototype to another view
-                // add all the dropdown items called by the prototype view
-                Dep.prototype.setupActionItems.call(this);
-            }
-            
-             this.dropdownItemList.push({
-                name: 'displayEsignatureDocument',
-                label: 'Display eSignature Document'
-            });               
-        },
+      this.dropdownItemList.push({
+        name: "displayEsignatureDocument",
+        label: "Display eSignature Document",
+      });
+    }
 
-        actionDisplayEsignatureDocument: function () {  
-            // get the document's template id if saved as a model field
-            if(this.model.attributes.templateId) {
-                var templateId = this.model.attributes.templateId;
-                var options = {
-                    entityType: this.model.name,
-                    entityId: this.model.id,
-                    templateId: templateId,
-                    model:this.model
-                };
-                this.getRouter().navigate("#EsignatureDocument/showDocument/options");
-                this.getRouter().dispatch("EsignatureDocument", 'showDocument', options);   
-            // if the template is not pre-determined, open modal to choose one
-            } else {
-                this.createView('pdfTemplate', 'views/modals/select-template', {
-                    entityType: this.model.name
-                }, function (view) {
-                    view.render();
-                    this.listenToOnce(view, 'select', function (model) {
-                        this.clearView('pdfTemplate');
-                        var templateId = model.id;
-                        var options = {
-                            entityType: this.model.name,
-                            entityId: this.model.id,
-                            templateId: templateId,
-                            model:this.model
-                        };
-                        this.getRouter().navigate("#EsignatureDocument/showDocument/options");
-                        this.getRouter().dispatch("EsignatureDocument", 'showDocument', options);   
-                    }, this);
-                });                                
-            }            
-	}                
-    });
+    actionDisplayEsignatureDocument() {
+      // Get the document's template id if saved as a model field
+      if (this.model.attributes.templateId) {
+        const templateId = this.model.attributes.templateId;
+        const options = {
+          entityType: this.model.name,
+          entityId: this.model.id,
+          templateId: templateId,
+          model: this.model,
+        };
+
+        this.getRouter().navigate("#EsignatureDocument/showDocument/options");
+        this.getRouter().dispatch(
+          "EsignatureDocument",
+          "showDocument",
+          options,
+        );
+      } else {
+        // If the template is not pre-determined, open modal to choose one
+        this.createView(
+          "pdfTemplate",
+          "views/modals/select-template",
+          {
+            entityType: this.model.name,
+          },
+          (view) => {
+            view.render();
+
+            this.listenToOnce(view, "select", (model) => {
+              this.clearView("pdfTemplate");
+
+              const templateId = model.id;
+              const options = {
+                entityType: this.model.name,
+                entityId: this.model.id,
+                templateId: templateId,
+                model: this.model,
+              };
+
+              this.getRouter().navigate(
+                "#EsignatureDocument/showDocument/options",
+              );
+              this.getRouter().dispatch(
+                "EsignatureDocument",
+                "showDocument",
+                options,
+              );
+            });
+          },
+        );
+      }
+    }
+  };
 });
-
