@@ -24,110 +24,154 @@
  *
  * In accordance with Section 7(b) of the GNU General Public License version 3,
  * these Appropriate Legal Notices must retain the display of the "EspoCRM" word
- * 
+ *
  * eSignature - Open source plug in module for EspoCRM
  * Copyright (C) 2020 Omar A Gonsenheim
  ************************************************************************/
 
-Espo.define('esignature:views/full-page-esignature-document', 'view', function (Dep) {
+define("esignature:views/full-page-esignature-document", ["view"], (View) => {
+  return class FullPageEsignatureDocumentView extends View {
+    el = "#main";
 
-    return Dep.extend({
+    setup() {
+      this.renderDocument();
+    }
 
-        el: '#main',
+    inlineEditClose() {
+      window.history.back();
+    }
 
-        setup: function () {
-            // run default function
-            this.renderDocument();
+    inlineEditSave($el, blankCanvasCode, fieldName) {
+      // Convert the canvas drawing to image code
+      const imageCode = $el.jSignature("getData", "svg");
+
+      // Compare against blank canvas
+      if (blankCanvasCode[1] === imageCode[1]) {
+        alert("No signature was entered");
+        return;
+      }
+
+      // Register the signature timestamp
+      const d = new Date();
+      const timestamp = eSignatureISODateString(d);
+
+      // Prepare the signature drawing to be stored
+      const translatedLabel = this.translate(
+        "electronicallySignedOn",
+        "messages",
+        "Global",
+      );
+      const imageSource =
+        '<img src="data:' +
+        $el.jSignature("getData", "svg") +
+        '"/>' +
+        '<div style="margin-top:-0.5em;font-size:0.7em;font-style:italic;">' +
+        translatedLabel +
+        " " +
+        timestamp +
+        "</div>";
+
+      this.notify("Saving...");
+
+      const data = {};
+      data[fieldName] = imageSource;
+
+      this.model.save(data, {
+        patch: true,
+        success: () => {
+          this.notify(false);
+          alert(
+            this.translate("signatureRecorded", "messages", "Global") ||
+              "Signature recorded, to close the document press the X button",
+          );
+          this.renderDocument();
         },
-        
-        inlineEditClose: function () { 
-            window.history.back();
+        error: () => {
+          this.notify("Error occurred", "error");
         },
-        
-   
-        inlineEditSave: function ($el, blankCanvassCode, fieldName) { // substitutes same function at base.js   
-            // convert the canvas drawing to image code 
-            var imageCode = $el.jSignature('getData','svg'); 
-            // compare the contents of the current vs blank canvass to make sure there's a signature to be saved
-            if(blankCanvassCode[1] === imageCode[1]) {
-                alert("No signature was entered");
-                //this.renderDocument();
-                return;
-            }  
-            // register the signature time stamp
-            var d = new Date();
-            var timestamp = eSignatureISODateString(d);             
-            // prepare the signature drawing to be stored in the database integrating the timestamp
-            var imageSource = '<img src=data:'+$el.jSignature('getData', 'svg')+'<div style=margin-top:-0.5em;font-size:0.7em;font-style:italic;>Firmado electrónicamente a '+timestamp+'</div>';
-            this.notify('Saving...');
-            // get the model attributes and load them into a "data" array
-            var data = this.model.attributes;
-            // store the image code as the field value
-            data[fieldName] = imageSource;
-            // persist the model with the updated field value
-            this.model.save(data,{});
-            this.notify(false);
-            alert("Signature recorded, to close the document press the 'X' button");                       
-            // display (re-render) the signed document
-            this.renderDocument();
-        },
-        
-        renderDocument: function(){
-            // determine if the user is a portal user
-            var isPortal = false;
-            if(this.getUser().attributes.isPortalUser) {
-                isPortal = true;
+      });
+    }
+
+    renderDocument() {
+      // Determine if the user is a portal user
+      const isPortal = !!this.getUser().get("isPortalUser");
+      this.options.isPortal = isPortal;
+
+      const url =
+        "?entryPoint=printForEsignature" +
+        "&entityType=" +
+        encodeURIComponent(this.options.entityType) +
+        "&entityId=" +
+        encodeURIComponent(this.options.entityId) +
+        "&templateId=" +
+        encodeURIComponent(this.options.templateId) +
+        "&isPortal=" +
+        isPortal;
+
+      const xmlhttp = new XMLHttpRequest();
+      const model = this.options.model;
+
+      xmlhttp.onreadystatechange = () => {
+        if (xmlhttp.readyState === XMLHttpRequest.DONE) {
+          if (xmlhttp.status === 200) {
+            const mainEl = document.getElementById("main");
+            if (mainEl) {
+              mainEl.innerHTML = xmlhttp.responseText;
             }
-            this.options.isPortal = isPortal;
-            var url = '?entryPoint=printForEsignature&entityType='+this.options.entityType+'&entityId='+this.options.entityId+'&templateId=' + this.options.templateId+'&isPortal='+this.options.isPortal;
-            // use plain javascript ajax to invoke an entryPoint and store the response in the "main" div (full page)
-            var xmlhttp = new XMLHttpRequest();
-            var model = this.options.model;
-            //console.log(model);
-            var self = this;
-            xmlhttp.onreadystatechange = function() {
-                if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
-                    // if the ajax call is successful render the content received in <div id="main">
-                    if (xmlhttp.status == 200) {
-                        document.getElementById("main").innerHTML = xmlhttp.responseText;
-                        // use jquery to insert esignature fields
-                        var $esignatureFields = $('.eSignature');
-                        $esignatureFields.each(function(){
-                            // get the field name
-                            var fieldName = $(this).data('fieldName');
-                            // continue only if the model field is empty
-                            var fieldValue = model.get(fieldName);
-                            if(!fieldValue) {
-                                // initialize jSignature plug-in to display canvas input
-                                var $sigDiv = $(this).jSignature({'UndoButton':true, 'color':'rgb(5, 1, 135)','SignHere':true});
-                                // get the blank canvass code value to compare against a filled canvas
-                                var blankCanvassCode = $sigDiv.jSignature('getData','svg');
-                                // add the inline action links ("Update" and "Cancel")
-                                var $saveLink = $('<a href="javascript:" class="pull-right inline-save-link">' + self.translate('Update') + '</a>');
-                                var $cancelLink = $('<a href="javascript:" class="pull-right inline-cancel-link">' + self.translate('Cancel') + '</a>');
-                                var $el = $(this);
-                                $el.parent().prepend($saveLink);
-                                $el.parent().prepend($cancelLink);
-                                $saveLink.click(function () {
-                                    self.inlineEditSave($el, blankCanvassCode, fieldName);
-                                }.bind(this));
-                                $cancelLink.click(function () {
-                                    self.inlineEditClose();
-                                }.bind(this));                                
-                            }                            
-                        });
-                    }
-                    else if (xmlhttp.status == 400) {
-                        alert('There was an error 400');
-                    }
-                    else {
-                        alert('something else other than 200 was returned');
-                    }
-                }
-            };
-            xmlhttp.open("POST",url , true);
-            xmlhttp.send();   
-        }    
-       
-    });
+
+            // Use jQuery to insert esignature fields
+            const $esignatureFields = $(".eSignature");
+
+            $esignatureFields.each((index, element) => {
+              const $field = $(element);
+              const fieldName = $field.data("fieldName");
+
+              // Continue only if the model field is empty
+              const fieldValue = model.get(fieldName);
+
+              if (!fieldValue) {
+                // Initialize jSignature plugin
+                const $sigDiv = $field.jSignature({
+                  UndoButton: true,
+                  color: "rgb(5, 1, 135)",
+                  SignHere: true,
+                });
+
+                // Get blank canvas code
+                const blankCanvasCode = $sigDiv.jSignature("getData", "svg");
+
+                // Add inline action links
+                const $saveLink = $(
+                  '<a href="javascript:" class="pull-right inline-save-link">' +
+                    this.translate("Update") +
+                    "</a>",
+                );
+                const $cancelLink = $(
+                  '<a href="javascript:" class="pull-right inline-cancel-link">' +
+                    this.translate("Cancel") +
+                    "</a>",
+                );
+
+                $field.parent().prepend($saveLink);
+                $field.parent().prepend($cancelLink);
+
+                $saveLink.on("click", () => {
+                  this.inlineEditSave($field, blankCanvasCode, fieldName);
+                });
+
+                $cancelLink.on("click", () => {
+                  this.inlineEditClose();
+                });
+              }
+            });
+          } else {
+            alert("Error loading document (status: " + xmlhttp.status + ")");
+          }
+        }
+      };
+
+      xmlhttp.open("POST", url, true);
+      xmlhttp.send();
+    }
+  };
 });

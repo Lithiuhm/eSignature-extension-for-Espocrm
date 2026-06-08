@@ -1,5 +1,5 @@
 {{#if value}}
-    <img src='{{imageSource}}' />
+    <span class="fas fa-signature text-soft" title="Signed"></span>
 {{else}}
-    {{translate 'None'}}
+    <span class="none-value">{{translate 'None'}}</span>
 {{/if}}

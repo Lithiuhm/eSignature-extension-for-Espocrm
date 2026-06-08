@@ -1,15 +1,21 @@
 {
-   "params":[
-   ],
-   "notCreatable": false,
-   "filter": false,
-   "fieldDefs":{
-      "type":"text",
-      "notStorable":false  
-   },
-   "view": "esignature:views/fields/esignature",
-   "textFilter": false,
-   "filter": false,
-   "fullTextSearch": false,    
-   "readOnly": false
+    "params": [
+        {
+            "name": "inlineEditDisabled",
+            "type": "bool",
+            "default": true
+        }
+    ],
+    "notCreatable": false,
+    "filter": false,
+    "fieldDefs": {
+        "type": "text",
+        "notStorable": false
+    },
+    "actualFields": [""],
+    "view": "esignature:views/fields/esignature",
+    "textFilter": false,
+    "fullTextSearch": false,
+    "readOnly": false,
+    "inlineEditDisabled": true
 }

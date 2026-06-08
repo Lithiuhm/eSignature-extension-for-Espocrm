@@ -1,5 +1,3 @@
 {{#if value}}
-    <img src='{{imageSource}}' />
-{{else}}
-    {{translate 'None'}}
+    <span style="font-size:0.8em;font-style:italic;">{{{imageSource}}}</span>
 {{/if}}
