@@ -35,26 +35,32 @@ namespace Espo\Modules\Esignature\EntryPoints;
 use Espo\Core\Api\Request;
 use Espo\Core\Api\Response;
 use Espo\Core\EntryPoint\EntryPoint;
-use Espo\Core\Exceptions\Error;
+use Espo\Core\Exceptions\BadRequest;
+use Espo\Modules\Esignature\Services\PrintForEsignature as PrintForEsignatureService;
 
 /**
- * Full page eSignature document (legacy feature).
- *
- * Implements the current EntryPoint interface. The old base class
- * Espo\Core\EntryPoints\Base was removed in EspoCRM 10; extending it broke
- * every entry point (avatars, images, attachments) as soon as the
- * extension was installed.
- *
- * Document rendering is not supported anymore: the PrintForEsignature
- * service still creates the Htmlizer with the EspoCRM 5 constructor
- * signature, which fails on current EspoCRM versions.
+ * Returns a PDF template rendered as a full page HTML document with eSignature placeholders.
  */
 class PrintForEsignature implements EntryPoint
 {
+    public function __construct(
+        private PrintForEsignatureService $service
+    ) {}
+
     public function run(Request $request, Response $response): void
     {
-        throw new Error(
-            'eSignature: full page document rendering is not supported on this EspoCRM version.'
-        );
+        $entityType = $request->getQueryParam('entityType');
+        $entityId = $request->getQueryParam('entityId');
+        $templateId = $request->getQueryParam('templateId');
+
+        if (!$entityType || !$entityId || !$templateId) {
+            throw new BadRequest();
+        }
+
+        $html = $this->service->buildFromTemplate($entityType, $entityId, $templateId);
+
+        $response
+            ->setHeader('Content-Type', 'text/html; charset=utf-8')
+            ->writeBody($html);
     }
 }
