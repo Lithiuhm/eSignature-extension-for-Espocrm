@@ -19,6 +19,12 @@ canvas {
     border: 1px solid black;
 }
 
+/* keep stored signature images inside the field, e.g. drawn in landscape, viewed in portrait */
+.esignature-image img {
+    max-width: 100%;
+    height: auto;
+}
+
 .signatureField {font-weight:bold;font-style:italic;font-family:'Comic Sans MS', cursive, sans-serif}
 
 body .printHTML {font-family:Helvetica, Arial, Verdana, sans-serif; font-size:11pt; color:#000000; margin: 0em 0em 0em 0em; }
