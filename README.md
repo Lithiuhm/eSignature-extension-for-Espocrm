@@ -71,7 +71,9 @@ And that is all
 
 ### And to get the date and time use 
 
-#### ```<img src="{{sign_date ESIGNATUREGFILEDNAME}}">``` 
+#### ```{{sign_date ESIGNATUREGFILEDNAME}}``` 
+
+(`sign_date` returns the date and time as text, so it must not be used inside `<img src="...">`.)
 
 ![put name and label](images/15.png?raw=true)
 ![put name and label](images/17.png?raw=true)
