@@ -32,34 +32,35 @@
 
 namespace Espo\Modules\Esignature\EntryPoints;
 
-use \Espo\Core\Exceptions\NotFound;
-use \Espo\Core\Exceptions\BadRequest;
+use Espo\Core\Api\Request;
+use Espo\Core\Api\Response;
+use Espo\Core\EntryPoint\EntryPoint;
+use Espo\Core\Exceptions\BadRequest;
+use Espo\Modules\Esignature\Services\PrintForEsignature as PrintForEsignatureService;
 
-class PrintForEsignature extends \Espo\Core\EntryPoints\Base
+/**
+ * Returns a PDF template rendered as a full page HTML document with eSignature placeholders.
+ */
+class PrintForEsignature implements EntryPoint
 {
-    public static $authRequired = true;
+    public function __construct(
+        private PrintForEsignatureService $service
+    ) {}
 
-    public function run()
+    public function run(Request $request, Response $response): void
     {
+        $entityType = $request->getQueryParam('entityType');
+        $entityId = $request->getQueryParam('entityId');
+        $templateId = $request->getQueryParam('templateId');
 
-        if (empty($_GET['entityId']) || empty($_GET['entityType']) || empty($_GET['templateId'])) {
+        if (!$entityType || !$entityId || !$templateId) {
             throw new BadRequest();
         }
-        $entityId = $_GET['entityId'];
-        $entityType = $_GET['entityType'];
-        $templateId = $_GET['templateId'];
-        $isPortal = $_GET['isPortal'];
 
-        $entity = $this->getEntityManager()->getEntity($entityType, $entityId);
-        $template = $this->getEntityManager()->getEntity('Template', $templateId);
+        $html = $this->service->buildFromTemplate($entityType, $entityId, $templateId);
 
-        if (!$entity || !$template) {
-            throw new NotFound();
-        }
-
-        $this->getContainer()->get('serviceFactory')->create('PrintForEsignature')->buildFromTemplate($entity, $template, $isPortal);
-
-        exit;
+        $response
+            ->setHeader('Content-Type', 'text/html; charset=utf-8')
+            ->writeBody($html);
     }
 }
-
