@@ -33,12 +33,15 @@ define("esignature:views/full-page-esignature-document", ["view"], (View) => {
   return class FullPageEsignatureDocumentView extends View {
     el = "#main";
 
-    setup() {
+    // Container for the document HTML returned by the entry point
+    templateContent = '<div class="esignature-document"></div>';
+
+    afterRender() {
       this.renderDocument();
     }
 
     inlineEditClose() {
-      window.history.back();
+      this.closeDocument();
     }
 
     inlineEditSave($el, blankCanvasCode, fieldName) {
@@ -61,9 +64,13 @@ define("esignature:views/full-page-esignature-document", ["view"], (View) => {
         "messages",
         "Global",
       );
+      // Base64: the plain SVG contains double quotes that would break the src attribute
+      const svgBase64 = $el.jSignature("getData", "svgbase64");
       const imageSource =
         '<img src="data:' +
-        $el.jSignature("getData", "svg") +
+        svgBase64[0] +
+        "," +
+        svgBase64[1] +
         '"/>' +
         '<div style="margin-top:-0.5em;font-size:0.7em;font-style:italic;">' +
         translatedLabel +
@@ -76,9 +83,8 @@ define("esignature:views/full-page-esignature-document", ["view"], (View) => {
       const data = {};
       data[fieldName] = imageSource;
 
-      this.model.save(data, {
-        patch: true,
-        success: () => {
+      this.model.save(data, { patch: true }).then(
+        () => {
           this.notify(false);
           alert(
             this.translate("signatureRecorded", "messages", "Global") ||
@@ -86,17 +92,28 @@ define("esignature:views/full-page-esignature-document", ["view"], (View) => {
           );
           this.renderDocument();
         },
-        error: () => {
+        () => {
           this.notify("Error occurred", "error");
         },
-      });
+      );
+    }
+
+    closeDocument() {
+      if (this.getUser().get("isPortalUser")) {
+        location.replace(document.referrer);
+      } else {
+        window.history.back();
+      }
+
+      // Restore the copyright notice
+      $("#footer").show();
+    }
+
+    printDocument() {
+      window.print();
     }
 
     renderDocument() {
-      // Determine if the user is a portal user
-      const isPortal = !!this.getUser().get("isPortalUser");
-      this.options.isPortal = isPortal;
-
       const url =
         "?entryPoint=printForEsignature" +
         "&entityType=" +
@@ -104,9 +121,7 @@ define("esignature:views/full-page-esignature-document", ["view"], (View) => {
         "&entityId=" +
         encodeURIComponent(this.options.entityId) +
         "&templateId=" +
-        encodeURIComponent(this.options.templateId) +
-        "&isPortal=" +
-        isPortal;
+        encodeURIComponent(this.options.templateId);
 
       const xmlhttp = new XMLHttpRequest();
       const model = this.options.model;
@@ -114,13 +129,19 @@ define("esignature:views/full-page-esignature-document", ["view"], (View) => {
       xmlhttp.onreadystatechange = () => {
         if (xmlhttp.readyState === XMLHttpRequest.DONE) {
           if (xmlhttp.status === 200) {
-            const mainEl = document.getElementById("main");
-            if (mainEl) {
-              mainEl.innerHTML = xmlhttp.responseText;
-            }
+            const $container = this.$el.find(".esignature-document");
+            $container.html(xmlhttp.responseText);
+
+            // Bind header buttons (inline handlers are blocked by the Content Security Policy)
+            $container
+              .find('[data-action="esignatureClose"]')
+              .on("click", () => this.closeDocument());
+            $container
+              .find('[data-action="esignaturePrint"]')
+              .on("click", () => this.printDocument());
 
             // Use jQuery to insert esignature fields
-            const $esignatureFields = $(".eSignature");
+            const $esignatureFields = $container.find(".eSignature");
 
             $esignatureFields.each((index, element) => {
               const $field = $(element);
@@ -141,13 +162,14 @@ define("esignature:views/full-page-esignature-document", ["view"], (View) => {
                 const blankCanvasCode = $sigDiv.jSignature("getData", "svg");
 
                 // Add inline action links
+                // role="button" instead of href="javascript:" (blocked by the Content Security Policy)
                 const $saveLink = $(
-                  '<a href="javascript:" class="pull-right inline-save-link">' +
+                  '<a role="button" tabindex="0" class="pull-right inline-save-link">' +
                     this.translate("Update") +
                     "</a>",
                 );
                 const $cancelLink = $(
-                  '<a href="javascript:" class="pull-right inline-cancel-link">' +
+                  '<a role="button" tabindex="0" class="pull-right inline-cancel-link">' +
                     this.translate("Cancel") +
                     "</a>",
                 );
@@ -155,11 +177,13 @@ define("esignature:views/full-page-esignature-document", ["view"], (View) => {
                 $field.parent().prepend($saveLink);
                 $field.parent().prepend($cancelLink);
 
-                $saveLink.on("click", () => {
+                $saveLink.on("click", (e) => {
+                  e.preventDefault();
                   this.inlineEditSave($field, blankCanvasCode, fieldName);
                 });
 
-                $cancelLink.on("click", () => {
+                $cancelLink.on("click", (e) => {
+                  e.preventDefault();
                   this.inlineEditClose();
                 });
               }
@@ -170,7 +194,8 @@ define("esignature:views/full-page-esignature-document", ["view"], (View) => {
         }
       };
 
-      xmlhttp.open("POST", url, true);
+      // EspoCRM only allows GET requests for entry points
+      xmlhttp.open("GET", url, true);
       xmlhttp.send();
     }
   };
