@@ -1,11 +1,5 @@
 {
-    "params": [
-        {
-            "name": "inlineEditDisabled",
-            "type": "bool",
-            "default": true
-        }
-    ],
+    "params": [],
     "notCreatable": false,
     "filter": false,
     "fieldDefs": {
