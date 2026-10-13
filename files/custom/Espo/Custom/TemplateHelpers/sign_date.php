@@ -18,8 +18,10 @@ class sign_date implements Helper
         $color = $data->getOption('color');        
         $text = $data->getArgumentList()[0] ?? '';        
 
-        // Expresión regular para extraer la cadena base64
-        $regex = '/Firmado electrónicamente a (\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})/';
+        // Signature timestamp (YYYY-MM-DD HH:MM:SS). Matched without the label in front,
+        // because the label is translated ("Firmado electrónicamente a", "Electronically signed on", ...).
+        // Base64 image data contains no spaces or colons, so it cannot match.
+        $regex = '/(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})/';
 
         // Variable para almacenar el resultado
         $result = '';
